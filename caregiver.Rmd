@@ -1,0 +1,46 @@
+library(mlogit)
+jurydata2<-mlogit.data(jurydata, varying=NULL, choice="caregiver", shape="wide")
+
+model<-mlogit(formula=caregiver ~ 0 | r_affair 
++ r_violence 
++ r_other
++ r_prisoner
++ r_disappear
++ r_disorder
++ off_lawyer
++ de_lawyer, data=jurydata2, reflevel="0")
+summary(model)
+
+model<-mlogit(formula=caregiver ~ 0 | r_affair 
++ r_violence 
++ r_other
++ r_prisoner
++ r_disappear
++ r_disorder
++ off_lawyer
++ de_lawyer, data=jurydata2, reflevel="1")
+summary(model)
+
+model<-mlogit(formula=caregiver ~ 0 | r_affair 
++ r_violence 
++ r_other
++ r_prisoner
++ r_disappear
++ r_disorder
++ off_lawyer
++ de_lawyer, data=jurydata2, reflevel="2")
+summary(model)
+
+model <- glm(de_lawyer ~ . , family = binomial() ,data = jury[,c(-1,-7)])
+summary(model)
+
+ju=jurydata[jurydata$caregiver==1,-6]
+ju2=jurydata[jurydata$caregiver!=1,-6]
+ju1=sample(nrow(ju), size=500)
+ju=ju[ju1,]
+ju3=merge(ju, ju2, all=TRUE)
+ctree.model <- ctree(caregiver ~ . , data = ju3)
+plot(ctree.model)
+
+m=mongo(collection = "plaintiff_violence", db = "violence", url = "mongodb://localhost",verbose = TRUE)
+plaintiff_violence <- m$find(query = "{}",fields = "{}",limit = 100)
